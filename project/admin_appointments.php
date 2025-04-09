@@ -1,0 +1,264 @@
+<?php
+include 'config.php';
+include 'admin_appointment_handler.php';
+
+session_start();
+$user_id = $_SESSION['user_id'];
+
+if (!isset($user_id)) {
+    header('location:admin_login.php');
+    exit();
+}
+
+if (isset($_GET['logout'])) {
+    unset($user_id);
+    session_destroy();
+    header('location:admin_login.php');
+    exit();
+}
+
+if (isset($_POST['submit'])) {
+    $result = insertAppointment($conn, $_POST);
+
+    if (!$result) {
+        die('Error: ' . mysqli_error($conn));
+    } else {
+        header('location: admin_appointments.php');
+        exit();
+    }
+}
+?>
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Appointments Page</title>
+
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+   <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 2px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+
+</head>
+<body>
+
+<!-- header section starts  -->
+
+<header class="header">
+
+   <nav class="navbar nav-1">
+      <section class="flex">
+         <a href="admin.php" class="logo"><i class="fas fa-house"></i>DreamHomes Admin</a>
+
+         <!-- <ul>
+            <li><a href="#">post property<i class="fas fa-paper-plane"></i></a></li>
+         </ul> -->
+      </section>
+   </nav>
+
+   <nav class="navbar nav-2">
+      <section class="flex">
+         <div id="menu-btn" class="fas fa-bars"></div>
+
+         <div class="menu">
+            <ul>
+               <li><a href="admin_property_listing_form.php">Property Listing</i></a></li>
+               <li><a href="admin_buyers.php">Buyers</i></a></li>
+               <li><a href="admin_sellers.php">Sellers</a></i></li>
+               <li><a href="admin_transactions.php">Transactions</a></i></li>
+               <li><a href="admin_appointments.php">Appointments</a></i></li>
+               <li><a href="admin_marketing.php">Marketing</a></i></li>
+               <li><a href="admin_reviews.php#faq">Reviews</a></i></li>
+            </ul>
+         </div>
+
+         <ul>
+            <!-- <li><a href="#">saved <i class="far fa-heart"></i></a></li> -->
+            <li>
+            <div class="account-container">
+            <div class="account-btn">
+                <h2><b>Account</b></h2>
+                <div class="profile">
+                    <ul>
+                        <li><!-- profile section starts -->
+                            <?php
+                            $select = mysqli_query($conn, "SELECT * FROM `User` WHERE U_ID = '$user_id'") or die('query failed');
+                            if(mysqli_num_rows($select) > 0){
+                                $fetch = mysqli_fetch_assoc($select);
+                            }
+                            if($fetch['image'] == ''){
+                                echo '<img src="images/default-avatar.png" width="100" height="100">';
+                            } else {
+                                echo '<img src="uploaded_img/'.$fetch['image'].'" width="100" height="100">';
+                            }
+                            ?>
+
+                            <?php if (!empty($fetch)): ?>
+                                <h2><?php echo $fetch['name']; ?></h2>
+                                <a href="update_profile.php" class="btn">Update Profile</a>
+                                <a href="admin.php?logout=<?php echo $user_id; ?>" class="delete-btn">Logout</a>
+                            <?php endif; ?>
+                        </li>
+                    </ul>
+
+                     </div>
+
+                  </div>
+               </ul>
+            </li>
+         </ul>
+
+         <script>
+            // JavaScript for handling hover event
+            const accountBtn = document.querySelector('.account-btn');
+            const profileContainer = document.querySelector('.profile');
+
+            accountBtn.addEventListener('mouseenter', function () {
+                profileContainer.style.display = 'block';
+            });
+
+            accountBtn.addEventListener('mouseleave', function () {
+                profileContainer.style.display = 'none';
+            });
+        </script>
+
+
+         
+      </section>
+      
+   </nav>
+
+</header>
+
+<!-- header section ends -->
+
+
+<section class="filters" style="padding-bottom: 0;">
+
+   <form action="" method="post" enctype="multipart/form-data">
+      <div id="close-filter"><i class="fas fa-times"></i></div>
+      <h3>Appointment</h3>
+      <?php if (isset($message)) : ?>
+            <p><?php echo $message; ?></p>
+        <?php endif; ?>
+         <div class="flex">
+            <div class="box">
+               <p>Client Name *</p>
+               <input type="text" name="name" required maxlength="50" placeholder="Client Name" class="input">
+            </div>
+            <div class="box">
+               <p>Email *</p>
+               <input type="text" name="email" required maxlength="50" placeholder="Enter Email" class="input">
+            </div>
+            <div class="box">
+               <p>Phone Number *</p>
+               <input type="text" name="phone_number" required maxlength="50" placeholder="Enter Phone Number" class="input">
+            </div>
+            <div class="box">
+               <p>Date *</p>
+               <input type="date" class="input" name="date" required>
+            </div>
+            <div class="box">
+               <p>Time Slot *</p>
+               <select name="time" class="input" required>
+                  <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+                  <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+                  <option value="12:00 PM - 01:00 PM">12:00 PM - 01:00 PM</option>
+                  <option value="01:00 PM - 02:00 PM">01:00 PM - 02:00 PM</option>
+                  <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+                  <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM</option>
+                  <option value="04:00 PM - 05:00 PM">04:00 PM - 05:00 PM</option>
+                  <option value="05:00 PM - 06:00 PM">05:00 PM - 06:00 PM</option>
+               </select>
+            </div>
+            <div class="box">
+               <p>Query</p>
+               <input type="text" name="query" maxlength="50" placeholder="Appointment Reason" class="input">
+            </div>
+            <div class="box">
+               <p>Property #</p>
+               <input type="text" name="P_no" maxlength="50" placeholder="Enter Property #" class="input">
+            </div>
+            <div class="box">
+               <p>Agent Name *</p>
+               <select name="A_Id" class="input" required>
+                  <option value="5051">Neelima</option>
+                  <option value="5052">Lara</option>
+                  <option value="5053">Dhavan</option>
+               </select>
+            </div>
+         </div>
+         <input type="submit" value="submit" name="submit" class="btn">
+   </form>
+
+</section>
+
+
+
+
+<section class="">
+    <h1>Appointment Information</h1>
+
+    <?php
+
+        
+        $sql = "SELECT * FROM Appointment";
+        $result = $conn->query($sql);
+
+        // Check if there are results
+        if ($result->num_rows > 0) {
+            // Output data in the form of a table
+            echo "<table border='1'>";
+            echo "<tr><th> Client Name </th><th> Email </th><th> Phone Number </th><th> Date </th><th> Time </th><th> Query </th><th> Property # </th><th> Agent ID </th></tr>";
+
+            // Output data of each row
+            while($row = $result->fetch_assoc()) {
+                echo "<tr>";
+                echo "<td>" . $row["name"] . "</td>";
+                echo "<td>" . $row["email"] . "</td>";
+                echo "<td>" . $row["phone_number"] . "</td>";
+                echo "<td>" . $row["date"] . "</td>";
+                echo "<td>" . $row["time"] . "</td>";
+                echo "<td>" . $row["query"] . "</td>";
+                echo "<td>" . $row["P_no"] . "</td>";
+                echo "<td>" . $row["A_Id"] . "</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+        } else {
+            echo "0 results";
+        }
+
+        
+    ?>
+    
+    </section>
+
+
+</body>
+</html>
