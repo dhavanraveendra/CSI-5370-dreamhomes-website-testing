@@ -2,22 +2,22 @@
 Black Box and White Box Testing of  DreamHomes Website 
 
 
-##Install XAMPP
+## Install XAMPP
 
 Run Apache Web Server
 
 
-##Setup DataBase
+## Setup DataBase
 
 Run lnd_db.sql on MySql WorkBench to get the Database with all the data and Stored Procedure
 
 
-##Update config.php file to successfully connect your database
+## Update config.php file to successfully connect your database
 
 Update the Username and Password for your MySql database and the database schema name as given while creating the database.
 
 
-##Website URLs
+## Website URLs
 
 The Home page URL can be used to navigate throughout the website
 
