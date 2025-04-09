@@ -19,7 +19,6 @@ Run lnd_db.sql on MySql WorkBench to get the Database with all the data and Stor
 
 
 
-
 ## Update config.php file to successfully connect your database
 
 Update the Username and Password for your MySql database and the database schema name as given while creating the database.
