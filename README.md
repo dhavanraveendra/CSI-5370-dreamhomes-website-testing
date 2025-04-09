@@ -15,13 +15,17 @@ Run Apache Web Server
 
 Run lnd_db.sql on MySql WorkBench to get the Database with all the data and Stored Procedure
 
-![config_file](project/images/config_file.png)
 
 
 
 ## Update config.php file to successfully connect your database
 
 Update the Username and Password for your MySql database and the database schema name as given while creating the database.
+
+![config_file](project/images/config_file.png)
+
+
+
 
 
 ## Website URLs
@@ -30,10 +34,20 @@ The Home page URL can be used to navigate throughout the website
 
 http://localhost/project/home.php
 
+![config_file](project/images/home_page.png)
+
+
+
+
+
 
 The Admin page URL can be used to navigate throughout the Admin portal
 
 http://localhost/project/admin.php
+
+![config_file](project/images/admin_page.png)
+
+
 
 Admin Credentials - dhavanraveendranath@gmail.com
 Password - Dhavan@29
